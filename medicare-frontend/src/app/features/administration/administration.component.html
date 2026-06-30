@@ -1,0 +1,176 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Administration — Référentiels</h1>
+  </div>
+
+  <mat-card>
+    <mat-tab-group>
+      <!-- ================= SUCCURSALES ================= -->
+      <mat-tab label="Succursales">
+        <div class="tab-body">
+          <form [formGroup]="sucursaleForm" (ngSubmit)="submitSucursale()" class="ref-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput formControlName="nom">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Adresse</mat-label>
+              <input matInput formControlName="adresse">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput formControlName="telephone">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>E-mail</mat-label>
+              <input matInput formControlName="email">
+            </mat-form-field>
+            <div class="form-buttons">
+              <button mat-raised-button color="primary" type="submit" [disabled]="sucursaleForm.invalid">
+                {{ editSucursaleId() ? 'Mettre à jour' : 'Ajouter' }}
+              </button>
+              @if (editSucursaleId()) {
+                <button mat-button type="button" (click)="resetSucursale()">Annuler</button>
+              }
+            </div>
+          </form>
+
+          @if (sucursaleService.sucursales().length === 0) {
+            <p class="empty-state">Aucune succursale.</p>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Nom</th><th>Adresse</th><th>Téléphone</th><th>E-mail</th><th class="actions-col">Actions</th></tr>
+              </thead>
+              <tbody>
+                @for (s of sucursaleService.sucursales(); track s.id_sucursale) {
+                  <tr>
+                    <td>{{ s.nom }}</td>
+                    <td>{{ s.adresse }}</td>
+                    <td>{{ s.telephone || '—' }}</td>
+                    <td>{{ s.email || '—' }}</td>
+                    <td>
+                      <div class="actions-cell">
+                        <button mat-icon-button (click)="editerSucursale(s)"><mat-icon>edit</mat-icon></button>
+                        <button mat-icon-button color="warn" (click)="supprimerSucursale(s)"><mat-icon>delete</mat-icon></button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- ================= SPÉCIALISATIONS ================= -->
+      <mat-tab label="Spécialisations">
+        <div class="tab-body">
+          <form [formGroup]="specialisationForm" (ngSubmit)="submitSpecialisation()" class="ref-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Libellé</mat-label>
+              <input matInput formControlName="libelle">
+            </mat-form-field>
+            <div class="form-buttons">
+              <button mat-raised-button color="primary" type="submit" [disabled]="specialisationForm.invalid">Ajouter</button>
+            </div>
+          </form>
+
+          @if (specialisationService.specialisations().length === 0) {
+            <p class="empty-state">Aucune spécialisation.</p>
+          } @else {
+            <table class="data-table">
+              <thead><tr><th>Libellé</th><th class="actions-col">Actions</th></tr></thead>
+              <tbody>
+                @for (sp of specialisationService.specialisations(); track sp.id_specialisation) {
+                  <tr>
+                    <td>{{ sp.libelle }}</td>
+                    <td><div class="actions-cell">
+                      <button mat-icon-button color="warn" (click)="supprimerSpecialisation(sp.id_specialisation)"><mat-icon>delete</mat-icon></button>
+                    </div></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- ================= TYPES DE MALADIES ================= -->
+      <mat-tab label="Types de maladies">
+        <div class="tab-body">
+          <form [formGroup]="typeMaladieForm" (ngSubmit)="submitTypeMaladie()" class="ref-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Libellé</mat-label>
+              <input matInput formControlName="libelle">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Code CIM</mat-label>
+              <input matInput formControlName="code_cim">
+            </mat-form-field>
+            <div class="form-buttons">
+              <button mat-raised-button color="primary" type="submit" [disabled]="typeMaladieForm.invalid">Ajouter</button>
+            </div>
+          </form>
+
+          @if (typeMaladieService.types().length === 0) {
+            <p class="empty-state">Aucun type de maladie.</p>
+          } @else {
+            <table class="data-table">
+              <thead><tr><th>Libellé</th><th>Code CIM</th><th class="actions-col">Actions</th></tr></thead>
+              <tbody>
+                @for (t of typeMaladieService.types(); track t.id_maladie) {
+                  <tr>
+                    <td>{{ t.libelle }}</td>
+                    <td>{{ t.code_cim || '—' }}</td>
+                    <td><div class="actions-cell">
+                      <button mat-icon-button color="warn" (click)="supprimerTypeMaladie(t.id_maladie)"><mat-icon>delete</mat-icon></button>
+                    </div></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- ================= ASSURANCES ================= -->
+      <mat-tab label="Assurances">
+        <div class="tab-body">
+          <form [formGroup]="assuranceForm" (ngSubmit)="submitAssurance()" class="ref-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput formControlName="nom">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <input matInput formControlName="type">
+            </mat-form-field>
+            <div class="form-buttons">
+              <button mat-raised-button color="primary" type="submit" [disabled]="assuranceForm.invalid">Ajouter</button>
+            </div>
+          </form>
+
+          @if (assuranceService.assurances().length === 0) {
+            <p class="empty-state">Aucune assurance.</p>
+          } @else {
+            <table class="data-table">
+              <thead><tr><th>Nom</th><th>Type</th><th class="actions-col">Actions</th></tr></thead>
+              <tbody>
+                @for (a of assuranceService.assurances(); track a.id_assurance) {
+                  <tr>
+                    <td>{{ a.nom }}</td>
+                    <td>{{ a.type || '—' }}</td>
+                    <td><div class="actions-cell">
+                      <button mat-icon-button color="warn" (click)="supprimerAssurance(a.id_assurance)"><mat-icon>delete</mat-icon></button>
+                    </div></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>

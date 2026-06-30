@@ -1,0 +1,87 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Agenda</h1>
+    @if (authService.hasRole('secretaire', 'admin')) {
+      <button mat-raised-button color="primary" (click)="nouveauRdv()">
+        <mat-icon>add</mat-icon> Nouveau rendez-vous
+      </button>
+    }
+  </div>
+
+  <mat-card class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Date</mat-label>
+      <input matInput type="date" [formControl]="dateControl" (change)="reload()">
+    </mat-form-field>
+
+    @if (authService.hasRole('admin', 'secretaire')) {
+      <mat-form-field appearance="outline">
+        <mat-label>Médecin</mat-label>
+        <mat-select [formControl]="medecinControl" (selectionChange)="reload()">
+          <mat-option [value]="''">Tous les médecins</mat-option>
+          @for (m of medecinService.medecins(); track m.id_nat) {
+            <mat-option [value]="m.id_nat">Dr {{ m.prenom }} {{ m.nom }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    <button mat-stroked-button (click)="reinitialiser()">
+      <mat-icon>refresh</mat-icon> Réinitialiser
+    </button>
+  </mat-card>
+
+  @if (rendezVousService.error()) {
+    <div class="error-banner">{{ rendezVousService.error() }}</div>
+  }
+
+  @if (rendezVousService.isLoading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (rendezVousService.rendezVous().length === 0) {
+    <p class="empty-state">Aucun rendez-vous.</p>
+  } @else {
+    <div class="rdv-list">
+      @for (rdv of rendezVousService.rendezVous(); track rdv.id_rdv) {
+        <mat-card class="rdv-card">
+          <div class="rdv-header">
+            <div class="rdv-when">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ rdv.date_rdv | date:'dd/MM/yyyy' }} · {{ rdv.heure_debut }} – {{ rdv.heure_fin }}</span>
+            </div>
+            @switch (rdv.statut) {
+              @case ('Planifié') { <span class="badge planifie">Planifié</span> }
+              @case ('En cours') { <span class="badge en-cours">En cours</span> }
+              @case ('Terminé') { <span class="badge termine">Terminé</span> }
+              @case ('Annulé') { <span class="badge annule">Annulé</span> }
+            }
+          </div>
+
+          <div class="rdv-body">
+            <p><strong>Patient :</strong> {{ rdv.patient_nom }}</p>
+            <p><strong>Médecin :</strong> {{ rdv.medecin_nom }}</p>
+            @if (rdv.sucursale_nom) { <p><strong>Succursale :</strong> {{ rdv.sucursale_nom }}</p> }
+            @if (rdv.motif) { <p><strong>Motif :</strong> {{ rdv.motif }}</p> }
+          </div>
+
+          <div class="rdv-actions">
+            @if (peutGererStatut(rdv)) {
+              <button mat-stroked-button [matMenuTriggerFor]="statutMenu">
+                <mat-icon>flag</mat-icon> Statut
+              </button>
+              <mat-menu #statutMenu="matMenu">
+                @for (s of statuts; track s) {
+                  <button mat-menu-item (click)="changerStatut(rdv, s)">{{ s }}</button>
+                }
+              </mat-menu>
+            }
+            @if (authService.hasRole('secretaire', 'admin')) {
+              <button mat-icon-button color="warn" (click)="supprimer(rdv)" aria-label="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

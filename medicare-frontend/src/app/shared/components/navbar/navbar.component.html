@@ -1,0 +1,48 @@
+<mat-toolbar color="primary" class="navbar">
+  <a routerLink="/dashboard" class="brand">
+    <mat-icon>local_hospital</mat-icon>
+    <span class="brand-name">MediCare Manager</span>
+  </a>
+
+  <nav class="nav-links">
+    @if (authService.hasRole('secretaire', 'admin', 'medecin')) {
+      <a mat-button routerLink="/patients" routerLinkActive="active-link">Patients</a>
+    }
+    @if (authService.hasRole('secretaire', 'admin', 'medecin')) {
+      <a mat-button routerLink="/agenda" routerLinkActive="active-link">Agenda</a>
+    }
+    @if (authService.hasRole('secretaire', 'admin')) {
+      <a mat-button routerLink="/paiements" routerLinkActive="active-link">Paiements</a>
+    }
+    @if (authService.hasRole('admin')) {
+      <a mat-button routerLink="/paiements/audit" routerLinkActive="active-link">Journal d'audit</a>
+    }
+    @if (authService.hasRole('admin', 'medecin', 'secretaire')) {
+      <a mat-button routerLink="/personnel/medecins" routerLinkActive="active-link">Médecins</a>
+    }
+    @if (authService.hasRole('admin')) {
+      <a mat-button routerLink="/personnel/secretaires" routerLinkActive="active-link">Secrétaires</a>
+    }
+    @if (authService.hasRole('admin')) {
+      <a mat-button routerLink="/administration" routerLinkActive="active-link">Administration</a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  <div class="user-zone">
+    <div class="user-info">
+      <span class="user-name">{{ authService.nom() }}</span>
+      <span class="user-role">{{ roleLabel() }}</span>
+    </div>
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu utilisateur">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Déconnexion</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

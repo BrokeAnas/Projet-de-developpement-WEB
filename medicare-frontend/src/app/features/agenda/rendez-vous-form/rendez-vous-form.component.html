@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>Nouveau rendez-vous</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="rdv-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Patient</mat-label>
+      <input matInput [formControl]="patientControl" [matAutocomplete]="auto" placeholder="Rechercher un patient…">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPatient">
+        @for (p of filteredPatients(); track p.id_nat) {
+          <mat-option [value]="p">{{ p.prenom }} {{ p.nom }} ({{ p.id_nat }})</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Médecin</mat-label>
+      <mat-select formControlName="id_nat_medecin">
+        @for (m of medecinService.medecins(); track m.id_nat) {
+          <mat-option [value]="m.id_nat">Dr {{ m.prenom }} {{ m.nom }} — {{ m.specialisation }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Succursale</mat-label>
+      <mat-select formControlName="id_sucursale">
+        @for (s of sucursaleService.sucursales(); track s.id_sucursale) {
+          <mat-option [value]="s.id_sucursale">{{ s.nom }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput type="date" formControlName="date_rdv">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Heure de début</mat-label>
+        <input matInput type="time" formControlName="heure_debut">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Heure de fin</mat-label>
+        <input matInput type="time" formControlName="heure_fin">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Motif</mat-label>
+      <input matInput formControlName="motif">
+    </mat-form-field>
+
+    @if (conflitMessage()) {
+      <div class="error-banner">{{ conflitMessage() }}</div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="annuler()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="saving()">Planifier</button>
+</mat-dialog-actions>

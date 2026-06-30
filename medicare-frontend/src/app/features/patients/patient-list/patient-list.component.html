@@ -1,0 +1,71 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Patients</h1>
+    @if (authService.hasRole('secretaire', 'admin')) {
+      <a mat-raised-button color="primary" routerLink="/patients/new">
+        <mat-icon>person_add</mat-icon> Nouveau patient
+      </a>
+    }
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width search-field">
+    <mat-label>Rechercher (nom, prénom, n° national)</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="Tapez pour filtrer…">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  @if (patientService.error()) {
+    <div class="error-banner">{{ patientService.error() }}</div>
+  }
+
+  @if (patientService.isLoading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (patientService.patients().length === 0) {
+    <p class="empty-state">Aucun patient trouvé.</p>
+  } @else {
+    <mat-card>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° National</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Date de naissance</th>
+            <th>Téléphone</th>
+            <th>E-mail</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (patient of patientService.patients(); track patient.id_nat) {
+            <tr>
+              <td>{{ patient.id_nat }}</td>
+              <td>{{ patient.nom }}</td>
+              <td>{{ patient.prenom }}</td>
+              <td>{{ patient.date_naissance | date:'dd/MM/yyyy' }}</td>
+              <td>{{ patient.telephone || '—' }}</td>
+              <td>{{ patient.email || '—' }}</td>
+              <td>
+                <div class="actions-cell">
+                  <button mat-icon-button color="primary" (click)="voir(patient.id_nat)" matTooltip="Consulter">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  @if (authService.hasRole('secretaire', 'admin')) {
+                    <button mat-icon-button (click)="editer(patient.id_nat)" matTooltip="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  }
+                  @if (authService.hasRole('admin')) {
+                    <button mat-icon-button color="warn" (click)="supprimer(patient)" matTooltip="Supprimer">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card>
+  }
+</div>

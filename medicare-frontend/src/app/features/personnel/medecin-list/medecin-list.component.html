@@ -1,0 +1,60 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Médecins</h1>
+    @if (authService.hasRole('admin')) {
+      <button mat-raised-button color="primary" (click)="nouveau()">
+        <mat-icon>add</mat-icon> Nouveau médecin
+      </button>
+    }
+  </div>
+
+  @if (medecinService.error()) {
+    <div class="error-banner">{{ medecinService.error() }}</div>
+  }
+
+  @if (medecinService.isLoading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (medecinService.medecins().length === 0) {
+    <p class="empty-state">Aucun médecin.</p>
+  } @else {
+    <mat-card>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° National</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>E-mail</th>
+            <th>Spécialisation</th>
+            <th>Succursale</th>
+            @if (authService.hasRole('admin')) { <th class="actions-col">Actions</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of medecinService.medecins(); track m.id_nat) {
+            <tr>
+              <td>{{ m.id_nat }}</td>
+              <td>{{ m.nom }}</td>
+              <td>{{ m.prenom }}</td>
+              <td>{{ m.email }}</td>
+              <td>{{ m.specialisation || '—' }}</td>
+              <td>{{ m.sucursale || '—' }}</td>
+              @if (authService.hasRole('admin')) {
+                <td>
+                  <div class="actions-cell">
+                    <button mat-icon-button (click)="modifier(m)" matTooltip="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="supprimer(m)" matTooltip="Supprimer">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card>
+  }
+</div>

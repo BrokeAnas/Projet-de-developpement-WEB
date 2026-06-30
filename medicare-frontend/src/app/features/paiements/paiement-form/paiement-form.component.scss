@@ -1,0 +1,30 @@
+.paiement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 420px;
+  padding-top: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row mat-form-field {
+  flex: 1;
+}
+
+.patient-ro {
+  margin: 0 0 12px;
+}
+
+@media (max-width: 480px) {
+  .paiement-form {
+    min-width: unset;
+  }
+}

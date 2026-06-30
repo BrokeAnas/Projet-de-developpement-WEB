@@ -1,0 +1,141 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-button (click)="retour()"><mat-icon>arrow_back</mat-icon> Retour</button>
+    @if (authService.hasRole('secretaire', 'admin')) {
+      <button mat-raised-button color="primary" (click)="editer()">
+        <mat-icon>edit</mat-icon> Modifier
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (patient(); as p) {
+    <!-- Informations civiles -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>{{ p.prenom }} {{ p.nom }}</mat-card-title>
+        <mat-card-subtitle>N° National : {{ p.id_nat }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div><span class="label">Date de naissance</span><span>{{ p.date_naissance | date:'dd/MM/yyyy' }}</span></div>
+          <div><span class="label">Téléphone</span><span>{{ p.telephone || '—' }}</span></div>
+          <div><span class="label">E-mail</span><span>{{ p.email || '—' }}</span></div>
+          <div><span class="label">Adresse</span><span>{{ p.adresse || '—' }}</span></div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Assurances -->
+    <mat-card class="section-card">
+      <mat-card-header><mat-card-title>Assurances</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (assurances().length === 0) {
+          <p class="empty-state">Aucune assurance enregistrée.</p>
+        } @else {
+          <ul class="assurance-list">
+            @for (a of assurances(); track a.id_assurance) {
+              <li class="assurance-item">
+                <div>
+                  <strong>{{ a.nom }}</strong> @if (a.type) { <span class="muted">({{ a.type }})</span> }
+                  <div class="muted">N° {{ a.numero_affiliation || '—' }}
+                    @if (a.date_debut) { · depuis {{ a.date_debut | date:'dd/MM/yyyy' }} }
+                  </div>
+                </div>
+                @if (authService.hasRole('secretaire', 'admin')) {
+                  <button mat-icon-button color="warn" (click)="retirerAssurance(a)" aria-label="Retirer">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        }
+
+        @if (authService.hasRole('secretaire', 'admin')) {
+          <button mat-stroked-button color="primary" (click)="toggleAssuranceForm()">
+            <mat-icon>add</mat-icon> Ajouter une assurance
+          </button>
+
+          @if (showAssuranceForm()) {
+            <form [formGroup]="assuranceForm" (ngSubmit)="submitAssurance()" class="inline-form">
+              <mat-form-field appearance="outline">
+                <mat-label>Assurance</mat-label>
+                <mat-select formControlName="id_assurance">
+                  @for (ref of assurancesRef(); track ref.id_assurance) {
+                    <mat-option [value]="ref.id_assurance">{{ ref.nom }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>N° d'affiliation</mat-label>
+                <input matInput formControlName="numero_affiliation">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date de début</mat-label>
+                <input matInput type="date" formControlName="date_debut">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date de fin</mat-label>
+                <input matInput type="date" formControlName="date_fin">
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="submit" [disabled]="assuranceForm.invalid">Enregistrer</button>
+            </form>
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Dossier médical : médecin / admin uniquement (RG-05) -->
+    @if (authService.hasRole('medecin', 'admin')) {
+      <mat-card class="section-card">
+        <mat-card-header><mat-card-title>Dossier médical (pathologies)</mat-card-title></mat-card-header>
+        <mat-card-content>
+          @if (maladies().length === 0) {
+            <p class="empty-state">Aucun antécédent médical enregistré.</p>
+          } @else {
+            @for (maladie of maladies(); track maladie.id_maladie) {
+              <div class="maladie-item">
+                <div class="maladie-head">
+                  <span class="libelle">{{ maladie.libelle }}</span>
+                  <span class="date">{{ maladie.date_diagnostic | date:'dd/MM/yyyy' }}</span>
+                </div>
+                @if (maladie.medecin_nom) { <div class="muted">Dr {{ maladie.medecin_nom }}</div> }
+                @if (maladie.observations) { <p class="observations">{{ maladie.observations }}</p> }
+              </div>
+            }
+          }
+
+          <button mat-raised-button color="primary" (click)="ajouterDiagnostic()">
+            <mat-icon>add</mat-icon> Ajouter un diagnostic
+          </button>
+
+          @if (showDiagnosticForm()) {
+            <form [formGroup]="diagnosticForm" (ngSubmit)="submitDiagnostic()" class="inline-form">
+              <mat-form-field appearance="outline">
+                <mat-label>Pathologie</mat-label>
+                <mat-select formControlName="id_maladie">
+                  @for (type of typesMaladie(); track type.id_maladie) {
+                    <mat-option [value]="type.id_maladie">{{ type.libelle }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date du diagnostic</mat-label>
+                <input matInput type="date" formControlName="date_diagnostic">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Observations</mat-label>
+                <textarea matInput rows="2" formControlName="observations"></textarea>
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="submit" [disabled]="diagnosticForm.invalid">Enregistrer</button>
+            </form>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  } @else {
+    <p class="empty-state">Patient introuvable.</p>
+  }
+</div>

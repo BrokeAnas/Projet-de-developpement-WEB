@@ -1,0 +1,29 @@
+.medecin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 460px;
+  padding-top: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row mat-form-field {
+  flex: 1;
+}
+
+@media (max-width: 520px) {
+  .medecin-form {
+    min-width: unset;
+  }
+  .row {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,69 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Tableau de bord</h1>
+    <span class="welcome">Bonjour, {{ authService.nom() }}</span>
+  </div>
+
+  @if (authService.role() === 'admin') {
+    <div class="stats-grid">
+      @for (stat of stats(); track stat.label) {
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+            <h3>{{ stat.value }}</h3>
+            <p>{{ stat.label }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <div class="quick-links">
+      <a mat-raised-button color="primary" routerLink="/patients">
+        <mat-icon>people</mat-icon> Patients
+      </a>
+      <a mat-raised-button routerLink="/agenda">
+        <mat-icon>event</mat-icon> Agenda
+      </a>
+      <a mat-raised-button routerLink="/paiements/audit">
+        <mat-icon>receipt_long</mat-icon> Journal d'audit
+      </a>
+      <a mat-raised-button routerLink="/administration">
+        <mat-icon>settings</mat-icon> Administration
+      </a>
+    </div>
+  }
+
+  @if (authService.role() === 'secretaire') {
+    <h2 class="section-title">Rendez-vous du jour — votre succursale</h2>
+  }
+  @if (authService.role() === 'medecin') {
+    <h2 class="section-title">Votre agenda du jour</h2>
+  }
+
+  @if (authService.role() === 'secretaire' || authService.role() === 'medecin') {
+    @if (rendezVousService.isLoading()) {
+      <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+    } @else if (rendezVousService.rendezVous().length === 0) {
+      <p class="empty-state">Aucun rendez-vous prévu aujourd'hui.</p>
+    } @else {
+      <div class="rdv-day-list">
+        @for (rdv of rendezVousService.rendezVous(); track rdv.id_rdv) {
+          <mat-card class="rdv-card">
+            <div class="rdv-header">
+              <span class="heure">{{ rdv.heure_debut }} – {{ rdv.heure_fin }}</span>
+              @switch (rdv.statut) {
+                @case ('Planifié') { <span class="badge planifie">Planifié</span> }
+                @case ('En cours') { <span class="badge en-cours">En cours</span> }
+                @case ('Terminé') { <span class="badge termine">Terminé</span> }
+                @case ('Annulé') { <span class="badge annule">Annulé</span> }
+              }
+            </div>
+            <p><strong>Patient :</strong> {{ rdv.patient_nom }}</p>
+            <p><strong>Médecin :</strong> {{ rdv.medecin_nom }}</p>
+            @if (rdv.motif) { <p><strong>Motif :</strong> {{ rdv.motif }}</p> }
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>

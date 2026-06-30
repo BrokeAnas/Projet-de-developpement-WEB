@@ -1,0 +1,90 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Paiements</h1>
+    <button mat-raised-button color="primary" (click)="nouveau()">
+      <mat-icon>add</mat-icon> Nouveau paiement
+    </button>
+  </div>
+
+  <div class="indicators">
+    <mat-card class="indicator">
+      <span class="value">{{ paiementService.totalPaiements() }}</span>
+      <span class="label">Paiements affichés</span>
+    </mat-card>
+    <mat-card class="indicator">
+      <span class="value">{{ paiementService.montantTotal() | number:'1.2-2' }} €</span>
+      <span class="label">Montant total</span>
+    </mat-card>
+    <mat-card class="indicator">
+      <span class="value">{{ paiementService.montantDuMois() | number:'1.2-2' }} €</span>
+      <span class="label">Montant du mois</span>
+    </mat-card>
+  </div>
+
+  <mat-card class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>N° National patient</mat-label>
+      <input matInput [formControl]="patientControl">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Du</mat-label>
+      <input matInput type="date" [formControl]="dateDebutControl">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Au</mat-label>
+      <input matInput type="date" [formControl]="dateFinControl">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="reload()"><mat-icon>search</mat-icon> Filtrer</button>
+    <button mat-stroked-button (click)="reinitialiser()"><mat-icon>refresh</mat-icon> Réinitialiser</button>
+  </mat-card>
+
+  @if (paiementService.error()) {
+    <div class="error-banner">{{ paiementService.error() }}</div>
+  }
+
+  @if (paiementService.isLoading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (paiementService.paiements().length === 0) {
+    <p class="empty-state">Aucun paiement trouvé.</p>
+  } @else {
+    <mat-card>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Patient</th>
+            <th>Montant</th>
+            <th>Date</th>
+            <th>Mode</th>
+            <th>RDV</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of paiementService.paiements(); track p.id_paiement) {
+            <tr>
+              <td>{{ p.id_paiement }}</td>
+              <td>{{ p.patient_nom }}</td>
+              <td>{{ p.montant | number:'1.2-2' }} €</td>
+              <td>{{ p.date_paiement | date:'dd/MM/yyyy' }}</td>
+              <td>{{ p.mode_paiement || '—' }}</td>
+              <td>{{ p.id_rdv || '—' }}</td>
+              <td>
+                <div class="actions-cell">
+                  <button mat-icon-button (click)="modifier(p)" matTooltip="Modifier">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  @if (authService.hasRole('admin')) {
+                    <button mat-icon-button color="warn" (click)="supprimer(p)" matTooltip="Supprimer">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card>
+  }
+</div>

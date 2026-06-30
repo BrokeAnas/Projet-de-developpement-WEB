@@ -1,0 +1,87 @@
+.info-card,
+.section-card {
+  margin-bottom: 20px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.info-grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.assurance-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.assurance-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.maladie-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.maladie-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.maladie-head .libelle {
+  font-weight: 600;
+}
+
+.maladie-head .date {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.observations {
+  margin: 6px 0 0;
+  font-style: italic;
+  color: #374151;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.inline-form mat-form-field {
+  min-width: 200px;
+}
+
+.full-width {
+  width: 100%;
+}

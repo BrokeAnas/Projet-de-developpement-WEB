@@ -1,0 +1,50 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Journal d'audit financier</h1>
+    <span class="muted">Historique automatique des modifications et suppressions de paiements (triggers SQL)</span>
+  </div>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="loading-center"><mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner></div>
+  } @else if (logs().length === 0) {
+    <p class="empty-state">Aucune opération enregistrée.</p>
+  } @else {
+    <mat-card>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° Historique</th>
+            <th>Paiement</th>
+            <th>Patient</th>
+            <th>Montant</th>
+            <th>Date paiement</th>
+            <th>Opération</th>
+            <th>Date opération</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of logs(); track entry.id_historique) {
+            <tr>
+              <td>{{ entry.id_historique }}</td>
+              <td>{{ entry.id_paiement }}</td>
+              <td>{{ entry.patient_nom || entry.id_nat_patient }}</td>
+              <td>{{ entry.montant | number:'1.2-2' }} €</td>
+              <td>{{ entry.date_paiement | date:'dd/MM/yyyy' }}</td>
+              <td>
+                @switch (entry.operation) {
+                  @case ('UPDATE') { <span class="badge warning">Modification</span> }
+                  @case ('DELETE') { <span class="badge danger">Suppression</span> }
+                }
+              </td>
+              <td>{{ entry.date_operation | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card>
+  }
+</div>
