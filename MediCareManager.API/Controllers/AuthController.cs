@@ -26,15 +26,18 @@ public class AuthController : ControllerBase
         if (token is null)
             return Unauthorized(new { error = "Adresse e-mail ou mot de passe incorrect." });
 
+        // On décode le JWT pour extraire les claims et les renvoyer dans la réponse.
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        // On définit une fonction locale pour extraire un claim par son type.
         string Claim(string type) => jwt.Claims.FirstOrDefault(c => c.Type == type)?.Value ?? string.Empty;
 
+        // On construit la réponse avec le token et les informations de l'utilisateur.
         var response = new AuthResponseDto(
             Token: token,
             Role: Claim("role"),
             Nom: Claim("family_name"),
             Prenom: Claim("given_name"));
-
+        // 
         return Ok(response);
     }
 }

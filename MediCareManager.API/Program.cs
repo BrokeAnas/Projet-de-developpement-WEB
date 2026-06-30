@@ -76,7 +76,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
-
+// ----- Autorisation -----
+// On ne configure pas de politique d'autorisation spécifique, on se contente d'utiliser les rôles définis dans le JWT.
 builder.Services.AddAuthorization();
 
 // ----- CORS pour Angular (localhost:4200) -----
@@ -115,17 +116,17 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(new OpenApiSecurityRequirement { [scheme] = Array.Empty<string>() });
 });
 
+// ----- Build & Run -----
 var app = builder.Build();
-
+// ----- Middleware -----
 app.UseSwagger();
 app.UseSwaggerUI();
-
 // Traduction centralisée des exceptions métier en codes HTTP.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+// Redirection automatique vers HTTPS.
 app.UseCors("Angular");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+// ----- Run -----
 app.Run();
